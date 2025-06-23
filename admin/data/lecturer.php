@@ -20,8 +20,6 @@ function getLecturerById($lecturer_id, $conn) {
     return 0;
 }
 
-
-
 // Get all lecturers
 if (!function_exists('getAllLecturers')) {
     function getAllLecturers($conn) {
@@ -48,17 +46,36 @@ if (!function_exists('unameIsUnique')) {
         $count = $stmt->fetchColumn();
         return $count == 0 ? 1 : 0;
     }
-    
 }
 
 // Delete a lecturer by ID
 if (!function_exists('removeLecturer')) {
     function removeLecturer($lecturer_id, $conn) {
-        $sql  = "DELETE FROM lecturers WHERE lecturer_id = ?";
-        $stmt = $conn->prepare($sql);
-        $result = $stmt->execute([$lecturer_id]);
+        try {
+            $conn->beginTransaction();
 
-        return $result ? 1 : 0;
+            // Delete from lecturer_levels
+            $stmt1 = $conn->prepare("DELETE FROM lecturer_levels WHERE lecturer_id = ?");
+            $stmt1->execute([$lecturer_id]);
+
+            // Delete from lecturer_subjects
+            $stmt2 = $conn->prepare("DELETE FROM lecturer_subjects WHERE lecturer_id = ?");
+            $stmt2->execute([$lecturer_id]);
+
+            // Delete from lecturer_classes
+            $stmt3 = $conn->prepare("DELETE FROM lecturer_classes WHERE lecturer_id = ?");
+            $stmt3->execute([$lecturer_id]);
+
+            // Delete from lecturers
+            $stmt4 = $conn->prepare("DELETE FROM lecturers WHERE lecturer_id = ?");
+            $stmt4->execute([$lecturer_id]);
+
+            $conn->commit();
+            return 1;
+        } catch (PDOException $e) {
+            $conn->rollBack();
+            return 0;
+        }
     }
 }
 
@@ -72,7 +89,6 @@ function getLevelsByLecturer(int $lecturer_id, PDO $conn): array {
     $stmt->execute([$lecturer_id]);
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
-
 
 // Search lecturers by various fields
 if (!function_exists('searchLecturers')) {

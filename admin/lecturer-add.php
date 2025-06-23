@@ -9,7 +9,16 @@ include "../DB_connection.php";
 include "data/subject.php";
 include "data/department.php";
 
-$subjects    = getAllSubjects($conn);
+// Fetch only unassigned subjects
+$stmt = $conn->prepare(
+    "SELECT s.subject_id, s.subject, s.subject_code 
+     FROM subjects s 
+     LEFT JOIN lecturer_subjects ls ON s.subject_id = ls.subject_id 
+     WHERE ls.subject_id IS NULL"
+);
+$stmt->execute();
+$subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 $departments = getAllDepartments($conn);
 
 $fname            = $_POST['fname']            ?? '';
@@ -102,7 +111,7 @@ $department_id    = $_POST['department_id']    ?? '';
     <div class="mb-3">
       <label class="form-label">Gender</label><br>
       <input type="radio" name="gender" value="Male" checked> Male 
-      &nbsp;&nbsp;
+        
       <input type="radio" name="gender" value="Female"> Female
     </div>
 
@@ -112,47 +121,48 @@ $department_id    = $_POST['department_id']    ?? '';
     </div>
 
     <div class="mb-3">
-  <label class="form-label">Levels</label><br>
-  <div class="row row-cols-4">
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="ONE"
-             <?= in_array('ONE', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
-      ONE
-    </div>
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="TWO"
-             <?= in_array('TWO', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
-      TWO
-    </div>
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="THREE"
-             <?= in_array('THREE', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
-      THREE
-    </div>
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="FOUR"
-             <?= in_array('FOUR', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
-      FOUR
-    </div>
-  </div>
-</div>
-
-
-
-<div class="mb-3">
-  <label class="form-label">Subjects</label>
-  <div class="row row-cols-5">
-    <?php $subjects = is_array($subjects) ? $subjects : []; ?>
-    <?php foreach ($subjects as $subject): ?>
-      <div class="col">
-        <input type="checkbox" name="subjects[]" value="<?= $subject['subject_id'] ?>"
-               <?= in_array($subject['subject_id'], $subjectsSelected) ? 'checked' : '' ?>>
-        <?= htmlspecialchars($subject['subject']) ?>
+      <label class="form-label">Levels</label><br>
+      <div class="row row-cols-4">
+        <div class="col">
+          <input type="checkbox" name="levels[]" value="ONE"
+                 <?= in_array('ONE', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
+          ONE
+        </div>
+        <div class="col">
+          <input type="checkbox" name="levels[]" value="TWO"
+                 <?= in_array('TWO', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
+          TWO
+        </div>
+        <div class="col">
+          <input type="checkbox" name="levels[]" value="THREE"
+                 <?= in_array('THREE', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
+          THREE
+        </div>
+        <div class="col">
+          <input type="checkbox" name="levels[]" value="FOUR"
+                 <?= in_array('FOUR', $_POST['levels'] ?? []) ? 'checked' : '' ?>>
+          FOUR
+        </div>
       </div>
-    <?php endforeach; ?>
-  </div>
-</div>
+    </div>
 
+    <div class="mb-3">
+      <label class="form-label">Courses</label>
+      <div class="row row-cols-5">
+        <?php $subjects = is_array($subjects) ? $subjects : []; ?>
+        <?php if (empty($subjects)): ?>
+          <div class="col">No courses available.</div>
+        <?php else: ?>
+          <?php foreach ($subjects as $subject): ?>
+            <div class="col">
+              <input type="checkbox" name="subjects[]" value="<?= $subject['subject_id'] ?>"
+                     <?= in_array($subject['subject_id'], $subjectsSelected) ? 'checked' : '' ?>>
+              <?= htmlspecialchars($subject['subject']) ?>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
+    </div>
 
     <div class="mb-3">
       <label class="form-label">Department</label>

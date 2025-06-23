@@ -22,14 +22,28 @@ function getAllStudents($conn) {
 
 // DELETE
 function removeStudent($id, $conn){
-   $sql  = "DELETE FROM students
-           WHERE student_id=?";
-   $stmt = $conn->prepare($sql);
-   $re   = $stmt->execute([$id]);
-   if ($re) {
-     return 1;
-   } else {
-    return 0;
+   try {
+       // Start transaction
+       $conn->beginTransaction();
+
+       // Delete dependent records from student_subject_scores
+       $sql_scores = "DELETE FROM student_subject_scores WHERE student_id = ?";
+       $stmt_scores = $conn->prepare($sql_scores);
+       $stmt_scores->execute([$id]);
+
+       // Delete student from students
+       $sql_student = "DELETE FROM students WHERE student_id = ?";
+       $stmt_student = $conn->prepare($sql_student);
+       $stmt_student->execute([$id]);
+
+       // Commit transaction
+       $conn->commit();
+       return 1;
+   } catch (PDOException $e) {
+       // Roll back transaction on error
+       $conn->rollBack();
+       error_log("DELETE_STUDENT_ERROR: student_id=$id, error=" . $e->getMessage());
+       return 0;
    }
 }
 

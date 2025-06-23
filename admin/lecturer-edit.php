@@ -12,10 +12,19 @@ if (isset($_SESSION['admin_id']) &&
        include_once "data/class.php";
        include_once "data/lecturer.php";
        
-       $subjects = getAllSubjects($conn);
-       $departments = getAllDepartments($conn); // 🛠 Fetch departments
-       
+       // Fetch unassigned subjects or subjects assigned to this lecturer
        $lecturer_id = $_GET['lecturer_id'];
+       $stmt = $conn->prepare(
+           "SELECT s.subject_id, s.subject, s.subject_code 
+            FROM subjects s 
+            LEFT JOIN lecturer_subjects ls ON s.subject_id = ls.subject_id 
+            WHERE ls.subject_id IS NULL OR ls.lecturer_id = ?"
+       );
+       $stmt->execute([$lecturer_id]);
+       $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+       $departments = getAllDepartments($conn);
+       
        $lecturer = getLecturerById($lecturer_id, $conn);
 
        if ($lecturer == 0) {
@@ -28,13 +37,13 @@ if (isset($_SESSION['admin_id']) &&
            $assignedSubjects = explode(",", $lecturer['subjects']);
        }
 
-           // fetch assigned levels
-    $assignedLevels = [];
-    $lvlStmt = $conn->prepare("SELECT level FROM lecturer_levels WHERE lecturer_id = ?");
-    $lvlStmt->execute([$lecturer_id]);
-    while ($r = $lvlStmt->fetch(PDO::FETCH_ASSOC)) {
-        $assignedLevels[] = $r['level'];
-    }
+       // Fetch assigned levels
+       $assignedLevels = [];
+       $lvlStmt = $conn->prepare("SELECT level FROM lecturer_levels WHERE lecturer_id = ?");
+       $lvlStmt->execute([$lecturer_id]);
+       while ($r = $lvlStmt->fetch(PDO::FETCH_ASSOC)) {
+           $assignedLevels[] = $r['level'];
+       }
 
 ?>
 <!DOCTYPE html>
@@ -118,36 +127,35 @@ if (isset($_SESSION['admin_id']) &&
         </div>
 
         <div class="mb-3">
-  <label class="form-label">Levels</label><br>
-  <div class="row row-cols-4">
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="ONE"
-             <?= in_array('ONE', $assignedLevels) ? 'checked' : '' ?>>
-      ONE
-    </div>
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="TWO"
-             <?= in_array('TWO', $assignedLevels) ? 'checked' : '' ?>>
-      TWO
-    </div>
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="THREE"
-             <?= in_array('THREE', $assignedLevels) ? 'checked' : '' ?>>
-      THREE
-    </div>
-    <div class="col">
-      <input type="checkbox" name="levels[]" value="FOUR"
-             <?= in_array('FOUR', $assignedLevels) ? 'checked' : '' ?>>
-      FOUR
-    </div>
-  </div>
-</div>
-
+          <label class="form-label">Levels</label><br>
+          <div class="row row-cols-4">
+            <div class="col">
+              <input type="checkbox" name="levels[]" value="ONE"
+                     <?= in_array('ONE', $assignedLevels) ? 'checked' : '' ?>>
+              ONE
+            </div>
+            <div class="col">
+              <input type="checkbox" name="levels[]" value="TWO"
+                     <?= in_array('TWO', $assignedLevels) ? 'checked' : '' ?>>
+              TWO
+            </div>
+            <div class="col">
+              <input type="checkbox" name="levels[]" value="THREE"
+                     <?= in_array('THREE', $assignedLevels) ? 'checked' : '' ?>>
+              THREE
+            </div>
+            <div class="col">
+              <input type="checkbox" name="levels[]" value="FOUR"
+                     <?= in_array('FOUR', $assignedLevels) ? 'checked' : '' ?>>
+              FOUR
+            </div>
+          </div>
+        </div>
 
         <div class="mb-3">
           <label class="form-label">Gender</label><br>
           <input type="radio" value="Male" <?php if($lecturer['gender'] == 'Male') echo 'checked'; ?> name="gender"> Male
-          &nbsp;&nbsp;&nbsp;&nbsp;
+              
           <input type="radio" value="Female" <?php if($lecturer['gender'] == 'Female') echo 'checked'; ?> name="gender"> Female
         </div>
 
@@ -156,29 +164,32 @@ if (isset($_SESSION['admin_id']) &&
         <div class="mb-3">
           <label class="form-label">Subjects</label>
           <div class="row row-cols-5">
-            <?php foreach($subjects as $sub): ?>
-              <div class="col">
-                <input type="checkbox" name="subjects[]" value="<?=$sub['subject_id']?>"
-                  <?= in_array($sub['subject_id'], $assignedSubjects) ? 'checked' : '' ?>>
-                <?=$sub['subject']?>
-              </div>
-            <?php endforeach; ?>
+            <?php if (empty($subjects)): ?>
+              <div class="col">No unassigned subjects available.</div>
+            <?php else: ?>
+              <?php foreach($subjects as $sub): ?>
+                <div class="col">
+                  <input type="checkbox" name="subjects[]" value="<?=$sub['subject_id']?>"
+                    <?= in_array($sub['subject_id'], $assignedSubjects) ? 'checked' : '' ?>>
+                  <?=$sub['subject']?>
+                </div>
+              <?php endforeach; ?>
+            <?php endif; ?>
           </div>
         </div>
 
         <div class="mb-3">
-  <label class="form-label">Department</label>
-  <select name="department_id" class="form-select">
-    <option value="">Select Department</option>
-    <?php foreach($departments as $dep): ?>
-      <option value="<?= $dep['department_id'] ?>"
-        <?= ($lecturer['department_id'] == $dep['department_id']) ? 'selected' : '' ?>>
-        <?= htmlspecialchars($dep['faculty'] . ' - ' . $dep['department']) ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-</div>
-
+          <label class="form-label">Department</label>
+          <select name="department_id" class="form-select">
+            <option value="">Select Department</option>
+            <?php foreach($departments as $dep): ?>
+              <option value="<?= $dep['department_id'] ?>"
+                <?= ($lecturer['department_id'] == $dep['department_id']) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($dep['faculty'] . ' - ' . $dep['department']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
 
         <button type="submit" class="btn btn-primary">Update</button>
         </form>

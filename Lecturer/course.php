@@ -2,22 +2,20 @@
 session_start();
 if (isset($_SESSION['lecturer_id'], $_SESSION['role']) && $_SESSION['role'] === 'Lecturer') {
     include "../DB_connection.php";
-    include "data/subject.php";     // ← load subject helpers
-    include "data/department.php";  // ← for getDepartmentById()
+    include "data/subject.php";
+    include "data/department.php";
     include "data/lecturer.php";
 
     $lecturer_id = $_SESSION['lecturer_id'];
     $lecturer    = getLecturerById($lecturer_id, $conn);
-
-    // fetch only the subjects this lecturer teaches
-    $courses = getSubjectsByLecturer($lecturer_id, $conn);
+    $courses     = getSubjectsByLecturer($lecturer_id, $conn);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Lecturer – My Courses</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lecturer - My Courses</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../css/style.css" rel="stylesheet">
   <link rel="icon" href="../logo.png">
@@ -25,44 +23,55 @@ if (isset($_SESSION['lecturer_id'], $_SESSION['role']) && $_SESSION['role'] === 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-  <?php include "inc/navbar.php"; ?>
-
-  <div class="container mt-5">
-    <?php if (!empty($courses)): ?>
-      <div class="table-responsive">
-        <table class="table table-bordered mt-3 n-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Course</th>
-              <th>Course Code</th>
-              <th>Department</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($courses as $i => $c): 
-               $dept = getDepartmentById($c['department'], $conn);
-               $deptLabel = $dept
-                          ? htmlspecialchars($dept['faculty'].' - '.$dept['department'])
-                          : 'N/A';
-            ?>
-              <tr>
-                <td><?= $i+1 ?></td>
-                <td><?= htmlspecialchars($c['subject']) ?></td>
-                <td><?= htmlspecialchars($c['subject_code']) ?></td>
-                <td><?= $deptLabel ?></td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 p-0 bg-dark vh-100 sidebar">
+        <?php include "inc/sidebar.php"; ?>
       </div>
-    <?php else: ?>
-      <div class="alert alert-info">You are not assigned to teach any courses.</div>
-    <?php endif; ?>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10 p-4">
+        <h4 class="mb-4">My Courses</h4>
+
+        <?php if (!empty($courses)): ?>
+          <div class="table-responsive">
+            <table class="table table-bordered mt-3 n-table">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 5%;">#</th>
+                  <th>Course</th>
+                  <th>Course Code</th>
+                  <th>Department</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($courses as $i => $c): 
+                  $dept = getDepartmentById($c['department'], $conn);
+                  $deptLabel = $dept 
+                             ? htmlspecialchars($dept['faculty'] . ' - ' . $dept['department']) 
+                             : 'N/A';
+                ?>
+                  <tr>
+                    <td><?= $i + 1 ?></td>
+                    <td><?= htmlspecialchars($c['subject']) ?></td>
+                    <td><?= htmlspecialchars($c['subject_code']) ?></td>
+                    <td><?= $deptLabel ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        <?php else: ?>
+          <div class="alert alert-info">You are not assigned to teach any courses.</div>
+        <?php endif; ?>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Highlight "Courses" link
     $(function(){
       $("#navLinks li:nth-child(2) a").addClass('active');
     });

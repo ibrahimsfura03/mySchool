@@ -19,21 +19,24 @@ if (isset($_SESSION['admin_id']) && isset($_SESSION['role'])) {
             include '../../DB_connection.php';
             include "../data/student.php";
 
-            $fname = $_POST['fname'];
-            $lname = $_POST['lname'];
-            $uname = $_POST['username'];
+            $fname = trim($_POST['fname']);
+            $lname = trim($_POST['lname']);
+            $uname = trim($_POST['username']);
             $pass = $_POST['pass'];
-            $address = $_POST['address'];
+            $address = trim($_POST['address']);
             $gender = $_POST['gender'];
-            $email_address = $_POST['email_address'];
+            $email_address = trim($_POST['email_address']);
             $date_of_birth = $_POST['date_of_birth'];
-            $parent_fname = $_POST['parent_fname'];
-            $parent_lname = $_POST['parent_lname'];
-            $parent_phone_number = $_POST['parent_phone_number'];
-            $department_id = $_POST['department']; // <-- renamed to match DB column
+            $parent_fname = trim($_POST['parent_fname']);
+            $parent_lname = trim($_POST['parent_lname']);
+            $parent_phone_number = trim($_POST['parent_phone_number']);
+            $department_id = $_POST['department'];
             $level = isset($_POST['level']) && $_POST['level'] !== '' ? $_POST['level'] : 'ONE';
 
             $data = "uname=$uname&fname=$fname&lname=$lname&address=$address&gender=$gender&pfn=$parent_fname&pln=$parent_lname&ppn=$parent_phone_number&department=$department_id&level=$level";
+
+            // Debug: Log address input
+            error_log("STUDENT_ADD: address='$address', length=" . strlen($address));
 
             // Validation
             if (empty($fname)) {
@@ -48,6 +51,8 @@ if (isset($_SESSION['admin_id']) && isset($_SESSION['role'])) {
                 $em = "Password is required";
             } else if (empty($address)) {
                 $em = "Address is required";
+            } else if (strlen($address) > 50) {
+                $em = "Address is too long (maximum 50 characters)";
             } else if (empty($gender)) {
                 $em = "Gender is required";
             } else if (empty($email_address)) {
@@ -69,27 +74,40 @@ if (isset($_SESSION['admin_id']) && isset($_SESSION['role'])) {
 
             $pass = password_hash($pass, PASSWORD_DEFAULT);
 
+            // Trim address to ensure it fits within VARCHAR(50)
+            $address = substr($address, 0, 50);
+
+            // Debug: Log trimmed address
+            error_log("STUDENT_ADD: trimmed_address='$address', length=" . strlen($address));
+
             // Corrected INSERT query using department_id
             $sql = "INSERT INTO students
                       (username, password, fname, lname, department_id, address, gender, email_address, date_of_birth, parent_fname, parent_lname, parent_phone_number, level)
                     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                $uname,
-                $pass,
-                $fname,
-                $lname,
-                $department_id,
-                $address,
-                $gender,
-                $email_address,
-                $date_of_birth,
-                $parent_fname,
-                $parent_lname,
-                $parent_phone_number,
-                $level
-            ]);
+            try {
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    $uname,
+                    $pass,
+                    $fname,
+                    $lname,
+                    $department_id,
+                    $address,
+                    $gender,
+                    $email_address,
+                    $date_of_birth,
+                    $parent_fname,
+                    $parent_lname,
+                    $parent_phone_number,
+                    $level
+                ]);
+            } catch (PDOException $e) {
+                error_log("STUDENT_ADD: PDOException: " . $e->getMessage());
+                $em = "Database error: " . $e->getMessage();
+                header("Location: ../student-add.php?error=$em&$data");
+                exit;
+            }
 
             $sm = "New student registered successfully";
             header("Location: ../student-add.php?success=$sm");
