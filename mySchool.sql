@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS `myschool` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-
+CREATE DATABASE  IF NOT EXISTS `myschool` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `myschool`;
 -- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
@@ -33,7 +32,7 @@ CREATE TABLE `admin` (
   `lname` varchar(127) COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`admin_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,7 +41,7 @@ CREATE TABLE `admin` (
 
 LOCK TABLES `admin` WRITE;
 /*!40000 ALTER TABLE `admin` DISABLE KEYS */;
-INSERT INTO `admin` VALUES (1,'ibrahimsfura','$2y$10$TFyV000I6jNwmDYAt7x.R.iwtm27DSdIWYIYUIVDaTqaDgZ8yWAnC','Ibrahim','Suleiman'),(2,'hudu','$2y$10$K2rxSuBc98GlQ3UdNF9fBueUe7L9rF0eEz/a3VnO19IKnIxiNsEwy','Hudu','Nuhu');
+INSERT INTO `admin` VALUES (1,'ibrahimsfura','$2y$10$TFyV000I6jNwmDYAt7x.R.iwtm27DSdIWYIYUIVDaTqaDgZ8yWAnC','Ibrahim','Suleiman'),(2,'hudu','$2y$10$K2rxSuBc98GlQ3UdNF9fBueUe7L9rF0eEz/a3VnO19IKnIxiNsEwy','Hudu','Nuhu'),(3,'umar','$2y$10$3e3AdvfpMM.h4v4ZUaXxQOmAA/7sVhVL4BL6WqIq9BbayUATmh702','umar','umar');
 /*!40000 ALTER TABLE `admin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -82,7 +81,7 @@ CREATE TABLE `departments` (
   `faculty` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`department_id`),
   UNIQUE KEY `department_id` (`department_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -91,7 +90,7 @@ CREATE TABLE `departments` (
 
 LOCK TABLES `departments` WRITE;
 /*!40000 ALTER TABLE `departments` DISABLE KEYS */;
-INSERT INTO `departments` VALUES (1,'Software Engineering','Engineering'),(2,'Computer Science','Computing'),(3,'Geography','Science'),(4,'Political Science','SMS'),(5,'Buss Admin','Business'),(6,'Civil Engineering','Engineering');
+INSERT INTO `departments` VALUES (1,'Software Engineering','Engineering'),(2,'Computer Science','Computing'),(3,'Geography','Science'),(4,'Political Science','SMS'),(5,'Buss Admin','Business'),(6,'Civil Engineering','Engineering'),(7,'Islamic Dept','SMS');
 /*!40000 ALTER TABLE `departments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,7 +117,7 @@ CREATE TABLE `lecturer_classes` (
 
 LOCK TABLES `lecturer_classes` WRITE;
 /*!40000 ALTER TABLE `lecturer_classes` DISABLE KEYS */;
-INSERT INTO `lecturer_classes` VALUES (1,1),(2,1);
+INSERT INTO `lecturer_classes` VALUES (1,1),(5,2);
 /*!40000 ALTER TABLE `lecturer_classes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -136,7 +135,7 @@ CREATE TABLE `lecturer_levels` (
   PRIMARY KEY (`id`),
   KEY `lecturer_id` (`lecturer_id`),
   CONSTRAINT `lecturer_levels_ibfk_1` FOREIGN KEY (`lecturer_id`) REFERENCES `lecturers` (`lecturer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -145,7 +144,7 @@ CREATE TABLE `lecturer_levels` (
 
 LOCK TABLES `lecturer_levels` WRITE;
 /*!40000 ALTER TABLE `lecturer_levels` DISABLE KEYS */;
-INSERT INTO `lecturer_levels` VALUES (1,1,'ONE'),(2,1,'THREE'),(5,2,'ONE'),(6,2,'THREE');
+INSERT INTO `lecturer_levels` VALUES (1,1,'ONE'),(2,1,'THREE'),(23,5,'ONE'),(24,5,'TWO');
 /*!40000 ALTER TABLE `lecturer_levels` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -172,7 +171,7 @@ CREATE TABLE `lecturer_subjects` (
 
 LOCK TABLES `lecturer_subjects` WRITE;
 /*!40000 ALTER TABLE `lecturer_subjects` DISABLE KEYS */;
-INSERT INTO `lecturer_subjects` VALUES (1,1),(2,1),(2,4);
+INSERT INTO `lecturer_subjects` VALUES (1,1),(5,4);
 /*!40000 ALTER TABLE `lecturer_subjects` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -204,7 +203,7 @@ CREATE TABLE `lecturers` (
   UNIQUE KEY `username` (`username`),
   KEY `fk_lecturer_subject` (`subject_id`),
   CONSTRAINT `fk_lecturer_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`subject_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -213,7 +212,7 @@ CREATE TABLE `lecturers` (
 
 LOCK TABLES `lecturers` WRITE;
 /*!40000 ALTER TABLE `lecturers` DISABLE KEYS */;
-INSERT INTO `lecturers` VALUES (1,'ibrahimsfura','$2y$10$084/7r4eHnP4mOi.xxyebOruBoXQZEQ6oncRUib7LLeIstgeX0q02',NULL,'Ibrahim','Suleiman',NULL,'sardauna',1002,'2025-04-17','8033698607','Full stack software developer','Male','ibrahimsfura03@gmail.com','2025-05-06 11:13:29',NULL),(2,'umar','$2y$10$4CjgkopsI9yvQ4pvAXYb9.Uom53XkVicpu73IYVjKn6int5hDOBLW',NULL,'Umar','Muktar',NULL,'sardauna',2929,'2025-04-28','9828827738','BSc,','Male','umar@muktar.com','2025-05-06 11:17:56',NULL);
+INSERT INTO `lecturers` VALUES (1,'ibrahimsfura','$2y$10$084/7r4eHnP4mOi.xxyebOruBoXQZEQ6oncRUib7LLeIstgeX0q02',NULL,'Ibrahim','Suleiman',NULL,'sardauna',1002,'2025-04-17','8033698607','Full stack software developer','Male','ibrahimsfura03@gmail.com','2025-05-06 11:13:29',NULL),(5,'umar','$2y$10$ZMOV8TS6eEvc35hEZ/CboeEz3W1p0fWOEna6eUuj31NHGhlw9iUde',NULL,'umar','umar',NULL,'sardauna',2,'2025-06-04','8033698607','Full stack software developer','Male','umar@umar.com','2025-06-22 21:38:57',NULL);
 /*!40000 ALTER TABLE `lecturers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -267,7 +266,7 @@ CREATE TABLE `setting` (
 
 LOCK TABLES `setting` WRITE;
 /*!40000 ALTER TABLE `setting` DISABLE KEYS */;
-INSERT INTO `setting` VALUES (1,2025,'II','mySchool','Knowledge is light','Abouuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut');
+INSERT INTO `setting` VALUES (1,2025,'II','mySchool','Knowledge is light','Siuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
 /*!40000 ALTER TABLE `setting` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -318,9 +317,9 @@ CREATE TABLE `student_subject_scores` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `ux_student_subject` (`student_id`,`subject_id`),
   KEY `subject_id` (`subject_id`),
-  CONSTRAINT `student_subject_scores_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE,
+  CONSTRAINT `student_subject_scores_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`),
   CONSTRAINT `student_subject_scores_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`subject_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -329,6 +328,7 @@ CREATE TABLE `student_subject_scores` (
 
 LOCK TABLES `student_subject_scores` WRITE;
 /*!40000 ALTER TABLE `student_subject_scores` DISABLE KEYS */;
+INSERT INTO `student_subject_scores` VALUES (6,1,1,10,10,40,'2025-06-22 22:33:38','2025-06-22 22:33:38'),(8,4,4,10,11,60,'2025-06-22 23:13:57','2025-06-22 23:18:45'),(9,2,4,0,15,43,'2025-06-22 23:19:06','2025-06-22 23:19:06');
 /*!40000 ALTER TABLE `student_subject_scores` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -348,7 +348,7 @@ CREATE TABLE `students` (
   `department_id` int DEFAULT NULL,
   `level` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `cgpa` decimal(4,2) DEFAULT NULL,
-  `address` varchar(31) COLLATE utf8mb4_general_ci NOT NULL,
+  `address` varchar(500) COLLATE utf8mb4_general_ci NOT NULL,
   `gender` varchar(7) COLLATE utf8mb4_general_ci NOT NULL,
   `email_address` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `date_of_birth` date NOT NULL,
@@ -369,7 +369,7 @@ CREATE TABLE `students` (
 
 LOCK TABLES `students` WRITE;
 /*!40000 ALTER TABLE `students` DISABLE KEYS */;
-INSERT INTO `students` VALUES (1,'umar','$2y$10$zf4pcfhTfj.wKPAN8Q1FnumNdm80M4yyvNPopzK2fWhTG2URc/jaa','umar','Muktar',1,'ONE',0.00,'sardauna','Male','umar@muktar.com','2025-04-10','2025-05-06 10:15:28','muktar','umar','0999909990'),(2,'man','$2y$10$7q7U.xyLGBH8bDnhIjjTaOTzn6XXdSgKw7Eum2HdU14go7blwE2lK','Ibrahim','Adamu',5,'TWO-DE',NULL,'sardauna','Male','ibrahimsfura03@gmail.com','2025-04-28','2025-05-06 10:20:59','Ibrahim','Adamu','08033698607'),(3,'muhammad','$2y$10$zixfQBw02BwAlgiAALz9fObe1YxIdyTDwx20UbEZeomv/g1iw.hf.','Muhammad','musa',1,'ONE',0.00,'kwdo','Male','muhammad@musa.com','2025-04-18','2025-05-06 10:21:41','Ibrahim','Adamu','08033698607'),(4,'ebrahim','$2y$10$HyPyiY3w6DZ9h5uZnLM/7.9bxSnEAABw55ljH3F8d8EkSKF3K3Bdi','Ibrahim','Adamu',2,'ONE',0.00,'Pantami','Male','ibrahimsfura03@gmail.com','2025-04-04','2025-05-06 10:25:51','Ibrahim','Adamu','08033698607');
+INSERT INTO `students` VALUES (1,'ibrahimsfura','$2y$10$AfXvpfo2bxF58k2E2JLQnuhdxotG0AnZ5iHJqtcbP1FYYvBEea4pC','Ibrahim Suleiman','Adamu Fura',1,'ONE',NULL,'Pantami plato junction, Gombe Gombe State Nigeria','Male','fura.motive@gmail.com','2025-05-29','2025-06-22 21:55:30','Ibrahim Suleiman','Adamu Fura','08033698607'),(2,'umar','$2y$10$TxZSc291olDd/St9pUKFG.D/eD2dOWYkaOCLQENvbUS3qA0QPgptO','umar','umar',2,'ONE',2.90,'sardauna','Male','umar@umar.com','2025-06-09','2025-06-22 22:15:41','umar','umar','8033698607'),(4,'musa','$2y$10$kmQENuVHu35pTLiUAC9BbOOgLn0Vi8euE9XuacVW2lkqoB/dhxsey','musa','musa',2,'TWO',NULL,'estate','Male','musa@musa.com','2025-06-04','2025-06-22 23:12:35','musa','musa','8033698607');
 /*!40000 ALTER TABLE `students` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -386,7 +386,7 @@ CREATE TABLE `subjects` (
   `subject_code` varchar(31) COLLATE utf8mb4_general_ci NOT NULL,
   `department` int DEFAULT NULL,
   PRIMARY KEY (`subject_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -395,17 +395,9 @@ CREATE TABLE `subjects` (
 
 LOCK TABLES `subjects` WRITE;
 /*!40000 ALTER TABLE `subjects` DISABLE KEYS */;
-INSERT INTO `subjects` VALUES (1,'Software Testing','SEN3737',1),(2,'Tourism','SCS7273',3),(3,'Government','POL3728',4),(4,'Operating System','CSC3733',2);
+INSERT INTO `subjects` VALUES (1,'Software Testing','SEN3737',1),(2,'Tourism','SCS7273',3),(3,'Government','POL3728',4),(4,'Operating System','CSC3733',2),(5,'Pythomn','PY2828',2),(6,'Quran','GSP3238',7);
 /*!40000 ALTER TABLE `subjects` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Dumping events for database 'myschool'
---
-
---
--- Dumping routines for database 'myschool'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -416,4 +408,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-06 11:50:47
+-- Dump completed on 2025-06-23 21:59:24
